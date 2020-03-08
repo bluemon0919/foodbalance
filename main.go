@@ -4,11 +4,13 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"time"
 
 	"cloud.google.com/go/datastore"
 )
 
 type Meal struct {
+	Date     string
 	Name     string
 	TimeZone int
 	Group
@@ -80,7 +82,9 @@ func main() {
 		os.Exit(0)
 	}
 
+	t := time.Now()
 	var m Meal
+	m.Date = t.Format("2006-01-02")
 	m.Name = mealName
 	m.TimeZone = timeZone
 	m.Group = group
