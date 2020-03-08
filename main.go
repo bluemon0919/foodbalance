@@ -9,14 +9,11 @@ import (
 	"cloud.google.com/go/datastore"
 )
 
-// MealのメンバDateの日付フォーマット
-const dateFormat = "2006-01-02"
-
 type Meal struct {
-	Date         string
-	Name         string
-	TimeZone     int
-	BalanceGroup Group
+	Date     string
+	Name     string
+	TimeZone int
+	Group
 }
 type Group struct {
 	GrainDishes       int
@@ -24,15 +21,6 @@ type Group struct {
 	FishAndMealDishes int
 	Milk              int
 	Fruit             int
-}
-
-// Sum adds the entered Group to your own Group
-func (g *Group) Sum(in Group) {
-	g.GrainDishes += in.GrainDishes
-	g.VegetableDishes += in.VegetableDishes
-	g.FishAndMealDishes += in.FishAndMealDishes
-	g.Milk += in.Milk
-	g.Fruit += in.Fruit
 }
 
 var myProjectID string
@@ -96,12 +84,10 @@ func main() {
 
 	t := time.Now()
 	var m Meal
-	m.Date = t.Format(dateFormat)
+	m.Date = t.Format("2006-01-02")
 	m.Name = mealName
 	m.TimeZone = timeZone
-	m.BalanceGroup = group
-
-	fmt.Println("m:", m)
+	m.Group = group
 
 	/* datastoreに保存する*/
 	if err := Put(m); err != nil {
@@ -112,20 +98,9 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println("meals:", meales)
 
-	// Groupの合計を出力する
-	g := SumGroup(meales)
-	fmt.Println("g:", g)
-}
-
-// SumGroup returns sum of groups
-func SumGroup(ms []Meal) Group {
-	var group Group
-	for _, m := range ms {
-		group.Sum(m.BalanceGroup)
-	}
-	return group
+	fmt.Println("result")
+	fmt.Println(meales)
 }
 
 func Put(m Meal) error {
