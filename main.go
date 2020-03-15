@@ -1,39 +1,12 @@
 package main
 
 import (
-	"context"
 	"fmt"
+	"log"
+	"net/http"
 	"os"
 	"time"
-
-	"cloud.google.com/go/datastore"
 )
-
-// MealのメンバDateの日付フォーマット
-const dateFormat = "2006-01-02"
-
-type Meal struct {
-	Date         string
-	Name         string
-	TimeZone     int
-	BalanceGroup Group
-}
-type Group struct {
-	GrainDishes       int
-	VegetableDishes   int
-	FishAndMealDishes int
-	Milk              int
-	Fruit             int
-}
-
-// Sum adds the entered Group to your own Group
-func (g *Group) Sum(in Group) {
-	g.GrainDishes += in.GrainDishes
-	g.VegetableDishes += in.VegetableDishes
-	g.FishAndMealDishes += in.FishAndMealDishes
-	g.Milk += in.Milk
-	g.Fruit += in.Fruit
-}
 
 var myProjectID string
 
@@ -43,8 +16,21 @@ func main() {
 		fmt.Println("MY_PROJECT_ID is not set")
 		return
 	}
-	// 食事データの入力.
 
+	http.HandleFunc("/", Sample)
+	http.HandleFunc("/post", SamplePost)
+
+	// HTTPサーバを起動する
+	fmt.Println("http://localhost:8080 で起動中...")
+	log.Fatal(http.ListenAndServe(":8080", nil))
+
+	//CommandLine()
+}
+
+// CommandLine provides command line execution.
+func CommandLine() {
+
+	// 食事データの入力.
 	// タイムゾーンの選択
 	var timeZone int
 	for {
@@ -117,42 +103,4 @@ func main() {
 	// Groupの合計を出力する
 	g := SumGroup(meales)
 	fmt.Println("g:", g)
-}
-
-// SumGroup returns sum of groups
-func SumGroup(ms []Meal) Group {
-	var group Group
-	for _, m := range ms {
-		group.Sum(m.BalanceGroup)
-	}
-	return group
-}
-
-func Put(m Meal) error {
-	ctx := context.Background()
-	client, err := datastore.NewClient(ctx, myProjectID)
-	if err != nil {
-		return err
-	}
-	defer client.Close()
-
-	key := datastore.NameKey("Meal", "", nil)
-	_, err = client.Put(ctx, key, &m)
-	return err
-}
-
-func GetAll() ([]Meal, error) {
-	ctx := context.Background()
-	client, err := datastore.NewClient(ctx, myProjectID)
-	if err != nil {
-		return nil, err
-	}
-	defer client.Close()
-
-	var ms []Meal
-	q := datastore.NewQuery("Meal")
-	if _, err := client.GetAll(ctx, q, &ms); err != nil {
-		return nil, err
-	}
-	return ms, nil
 }
