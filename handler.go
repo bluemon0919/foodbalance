@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+// Sample handles input form
 func Sample(w http.ResponseWriter, r *http.Request) {
 	tpl := template.Must(template.ParseFiles("input.html"))
 	tpl.Execute(w, nil)
@@ -25,6 +26,7 @@ func Astois(ss []string) ([]int, error) {
 	return is, nil
 }
 
+// SamplePost handles input form posts and redirects
 func SamplePost(w http.ResponseWriter, r *http.Request) {
 	// HTTPメソッドをチェック（POSTのみ許可）
 	if r.Method != http.MethodPost {
@@ -48,4 +50,6 @@ func SamplePost(w http.ResponseWriter, r *http.Request) {
 	ts := t.Format(dateFormat)
 	m := Create(ts, name, timeZone, is[0], is[1], is[2], is[3], is[4])
 	Put(m)
+
+	http.Redirect(w, r, "/", 303)
 }
