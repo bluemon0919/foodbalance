@@ -1,0 +1,8 @@
+runtime: go113
+
+handlers:
+- url: /.*
+  script: auto
+
+env_variables:  
+  MY_PROJECT_ID: "ここにGCPプロジェクトIDを入力"
