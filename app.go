@@ -17,8 +17,9 @@ func main() {
 		return
 	}
 
-	http.HandleFunc("/", Sample)
-	http.HandleFunc("/post", SamplePost)
+	http.HandleFunc("/", WebpageHandler)
+	http.HandleFunc("/post", WebpagePostHandler)
+	http.HandleFunc("/webhook", Webhook)
 
 	// HTTPサーバを起動する
 	fmt.Println("http://localhost:8080 で起動中...")
