@@ -1,25 +1,61 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-	<meta charset="UTF-8"/>
-	<title>入力サンプル</title>
+<meta charset="UTF-8">
+<title>食事バランスデータ</title>
+<meta name="viewport" content="width=device-width,
+ initial-scale=1.0,user-scalable=yes" />
 </head>
 <body>
 	<div class="InputSample">
-
 	<!-- 入力エリア -->
-    <form class="InputSample" action="/post" method="post">
-        <p>タイムゾーン：<input type="text" name="TimeZone"></p>
-        <p>名前　　　　：<input type="text" name="Name"></p>
-        <p>主食　　　　：<input type="text" name="Group"></p>
-        <p>副菜　　　　：<input type="text" name="Group"></p>
-        <p>主菜　　　　：<input type="text" name="Group"></p>
-        <p>乳製品　　　：<input type="text" name="Group"></p>
-        <p>果物　　　　：<input type="text" name="Group"></p>
+    <form class="InputSample" action="/post?userid={{.Userid}}" method="post">
+        <h3>タイムゾーン</h3>
+        <p>朝食1, 昼食2, 夕食3, 間食4</p>
+        <input type="number" name="TimeZone"></p>
+
+        <h3>何を食べた？</h3>
+        <input type="text" name="Name"></p>
+
+        <h3>主食</h3>
+        <h4>ご飯、パン、麺など</h4>
+        <p>おにぎり1個、ごはん小盛り1杯、食パン1枚が「１つ」<br>
+        ごはん中盛り1杯は「1.5つ」<br>
+        麺類・パスタ類1人前は「２つ」くらい</p>
+        <input type="number" name="Group"></p>
+
+        <h3>副菜</h3>
+        <h4>野菜、イモ、豆（大豆を除く）、きのこ、海藻など</h4>
+        <p>小皿や小鉢に入った野菜料理1皿分が「１つ」<br>
+        中皿や中鉢に入ったものは「２つ」<br>
+        （サラダはこの量で「１つ」）</p>
+        <input type="number" name="Group"></p>
+        
+        <h3>主菜</h3>
+        <h4>肉、魚、卵、大豆</h4>
+        <p>卵1個の料理が「１つ」<br>
+        魚料理1人前は「２つ」<br>
+        肉料理1人前は「３つ」</p>
+        <input type="number" name="Group"></p>
+
+        <h3>乳製品</h3>
+        <h4>牛乳、チーズ、ヨーグルトなど</h4>
+        <p>プロセスチーズ1枚、ヨーグルト1パックが「１つ」<br>
+            牛乳1本は「２つ」
+        </p>
+        <input type="number" name="Group"></p>
+
+
+        <h3>果物</h3>
+        <h4>りんご、みかん、スイカ、イチゴなど</h4>
+        <p>みかん、バナナなど小さい果物1個が「１つ」<br>
+            りんごなど大きい果物1個が「２つ」くらい。
+        </p>
+        <input type="number" name="Group"></p>
+
         <p><input type="submit" value="送信する"></p>
 	</form>
 	<!-- ▲入力エリアここまで -->
-</div>
-
+    </div>
 </body>
 </html>

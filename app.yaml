@@ -5,4 +5,6 @@ handlers:
   script: auto
 
 env_variables:  
-  MY_PROJECT_ID: "ここにGCPプロジェクトIDを入力"
+  PROJECT_ID: ""
+  CHANNEL_SECRET: ""
+  CHANNEL_TOKEN: ""
