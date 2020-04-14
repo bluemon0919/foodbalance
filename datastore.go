@@ -82,15 +82,14 @@ func (r *Registration) Get(ctx context.Context, query *datastore.Query, entity *
 }
 
 // GetAll 全てのエンティティを取得する
-func (r *Registration) GetAll(ctx context.Context, entity *[]RegistrationData) error {
+func (r *Registration) GetAll(ctx context.Context, query *datastore.Query, entity *[]RegistrationData) error {
 	client, err := datastore.NewClient(ctx, r.projectID)
 	if err != nil {
 		return err
 	}
 	defer client.Close()
 
-	q := datastore.NewQuery("RegistrationData")
-	if _, err := client.GetAll(ctx, q, entity); err != nil {
+	if _, err := client.GetAll(ctx, query, entity); err != nil {
 		return err
 	}
 	return nil
