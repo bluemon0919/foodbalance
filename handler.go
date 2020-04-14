@@ -55,12 +55,38 @@ func (h *Handler) WebhookHandler(w http.ResponseWriter, r *http.Request) {
 
 // replyMessageExec sends a reply message to linebot
 func (h *Handler) replyMessageExec(event *linebot.Event, message *linebot.TextMessage) {
-	url := "https://foodbalance001.appspot.com/input" + "?userid=" + event.Source.UserID
-	linebotMessage := "登録には以下のリンクをクリックしてください." + url
-	resp := linebot.NewTextMessage(linebotMessage)
-	_, err := h.client.ReplyMessage(event.ReplyToken, resp).Do()
-	if err != nil {
-		log.Print(err)
+	switch message.Text {
+	case "入力":
+		url := "https://foodbalance001.appspot.com/input" + "?userid=" + event.Source.UserID
+		linebotMessage := "登録には以下のリンクをクリックしてください." + url
+		resp := linebot.NewTextMessage(linebotMessage)
+		_, err := h.client.ReplyMessage(event.ReplyToken, resp).Do()
+		if err != nil {
+			log.Print(err)
+		}
+	case "表示":
+		// 当日の集計を表示
+		date := time.Now().Format(dateFormat)
+		query := datastore.NewQuery("RegistrationData").Filter("UserID = ", event.Source.UserID).Filter("Date = ", date)
+		var regists []RegistrationData
+		if err := h.regist.GetAll(context.Background(), query, &regists); err != nil {
+			log.Print("Get失敗", err)
+			return
+		}
+
+		group := SumGroup(regists)
+		message := "今日食べたものは...\n"
+		for _, regist := range regists {
+			message = message + fmt.Sprintf("・%s\n", regist.Name)
+		}
+		message = message + "\n"
+		message = message + fmt.Sprintf("主食 : %d\n副菜 : %d\n主菜 : %d\n乳製品 : %d\n果物 : %d\n",
+			group.GrainDishes, group.VegetableDishes, group.FishAndMealDishes, group.Milk, group.Fruit)
+		resp := linebot.NewTextMessage(message)
+		_, err := h.client.ReplyMessage(event.ReplyToken, resp).Do()
+		if err != nil {
+			log.Print(err)
+		}
 	}
 }
 
