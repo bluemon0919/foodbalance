@@ -66,7 +66,9 @@ func (h *Handler) replyMessageExec(event *linebot.Event, message *linebot.TextMe
 		}
 	case "表示":
 		// 当日の集計を表示
-		date := time.Now().Format(dateFormat)
+		jp, _ := time.LoadLocation("Asia/Tokyo")
+		date := time.Now().In(jp).Format(dateFormat)
+		log.Println(date)
 		query := datastore.NewQuery("RegistrationData").Filter("UserID = ", event.Source.UserID).Filter("Date = ", date)
 		var regists []RegistrationData
 		if err := h.regist.GetAll(context.Background(), query, &regists); err != nil {
@@ -170,7 +172,9 @@ func (h *Handler) convertRegistration(r *http.Request, userid string) (*Registra
 	if err != nil {
 		return nil, err
 	}
-	ts := time.Now().Format(dateFormat)
+	jp, _ := time.LoadLocation("Asia/Tokyo")
+	ts := time.Now().In(jp).Format(dateFormat)
+	log.Println(ts)
 	group := Group{is[0], is[1], is[2], is[3], is[4]}
 	return NewRegistationData(userid, ts, name, timeZone, group), nil
 }
