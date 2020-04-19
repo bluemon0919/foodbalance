@@ -88,6 +88,33 @@ func (h *Handler) replyMessageExec(event *linebot.Event, message *linebot.TextMe
 		_, err := h.client.ReplyMessage(event.ReplyToken, resp).Do()
 		if err != nil {
 			log.Print(err)
+			return
+		}
+
+	case "平均":
+		// 過去一週間の平均値を出力する
+		var sumGroup Group
+		for i := 0; i < 7; i++ {
+			jp, _ := time.LoadLocation("Asia/Tokyo")
+			date := time.Now().In(jp).AddDate(0, 0, i-6).Format(dateFormat)
+			query := datastore.NewQuery("RegistrationData").Filter("UserID = ", event.Source.UserID).Filter("Date = ", date)
+			var regists []RegistrationData
+			if err := h.regist.GetAll(context.Background(), query, &regists); err != nil {
+				log.Print("Get失敗", err)
+				return
+			}
+			sumGroup.Sum(SumGroup(regists))
+		}
+		avgGroup := sumGroup.Div(7)
+
+		message := "過去一週間の平均は...\n"
+		message = message + fmt.Sprintf("主食 : %d\n副菜 : %d\n主菜 : %d\n乳製品 : %d\n果物 : %d\n",
+			avgGroup.GrainDishes, avgGroup.VegetableDishes, avgGroup.FishAndMealDishes, avgGroup.Milk, avgGroup.Fruit)
+		resp := linebot.NewTextMessage(message)
+		_, err := h.client.ReplyMessage(event.ReplyToken, resp).Do()
+		if err != nil {
+			log.Print(err)
+			return
 		}
 	}
 }
@@ -210,4 +237,14 @@ func (g *Group) Sum(in Group) {
 	g.FishAndMealDishes += in.FishAndMealDishes
 	g.Milk += in.Milk
 	g.Fruit += in.Fruit
+}
+
+// Div divide your group by the number you enter
+func (g *Group) Div(divisor int) Group {
+	g.GrainDishes /= divisor
+	g.VegetableDishes /= divisor
+	g.FishAndMealDishes /= divisor
+	g.Milk /= divisor
+	g.Fruit /= divisor
+	return *g
 }
