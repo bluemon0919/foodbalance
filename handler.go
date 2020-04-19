@@ -94,7 +94,8 @@ func (h *Handler) replyMessageExec(event *linebot.Event, message *linebot.TextMe
 
 // FormField is a field to replace with the input form
 type formField struct {
-	Userid string
+	Userid string // Linebot userID
+	Date   string // デフォルトの日付
 }
 
 type errorField struct {
@@ -115,6 +116,9 @@ func (h *Handler) InputformHandler(w http.ResponseWriter, r *http.Request) {
 		log.Printf("%s = %s\n", key, vs[0])
 		fd.Userid = vs[0] // UserIDを入力フォームのsubmitの際にクエリとして与える
 	}
+	jp, _ := time.LoadLocation("Asia/Tokyo")
+	ts := time.Now().In(jp).Format(dateFormat)
+	fd.Date = ts
 	tpl := template.Must(template.ParseFiles("input.html"))
 	tpl.Execute(w, fd)
 }
@@ -160,6 +164,7 @@ func (h *Handler) convertRegistration(r *http.Request, userid string) (*Registra
 	if err := r.ParseForm(); err != nil {
 		return nil, err
 	}
+	date := r.Form["Date"][0]
 	name := r.Form["Name"][0]
 	if len(name) == 0 {
 		return nil, fmt.Errorf("Error: %s", "Name is empty")
@@ -172,11 +177,8 @@ func (h *Handler) convertRegistration(r *http.Request, userid string) (*Registra
 	if err != nil {
 		return nil, err
 	}
-	jp, _ := time.LoadLocation("Asia/Tokyo")
-	ts := time.Now().In(jp).Format(dateFormat)
-	log.Println(ts)
 	group := Group{is[0], is[1], is[2], is[3], is[4]}
-	return NewRegistationData(userid, ts, name, timeZone, group), nil
+	return NewRegistationData(userid, date, name, timeZone, group), nil
 }
 
 // Astois is equivalent to Atoi for slice.
