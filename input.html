@@ -16,6 +16,9 @@
 	<div class="InputSample">
 	<!-- 入力エリア -->
     <form class="InputSample" action="/post?userid={{.Userid}}" method="post">
+        <h3>日付</h3>
+        <input type="date" name="Date" value={{.Date}}>
+
         <h3>タイムゾーン</h3>
         <p>朝食1, 昼食2, 夕食3, 間食4</p>
         <input type="number" name="TimeZone"></p>
